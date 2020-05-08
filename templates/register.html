@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>TINTD Registration</title>
+{% endblock %}
+
+{%block body %}
+<div class='login'>
+    <h1>Task Master Registration</h1>
+    <br>
+    <form method="POST">
+        <input type="email" name="email" required="required" id="email" placeholder="email">
+        <br>
+        <br>
+        <input type="text" name="userid" id="userid" required="required" placeholder="userid">
+        <br>
+        <br>
+        <input type="password" name="password" id="password" required="required" placeholder="password">
+        <br>
+        <br>
+        <input type="submit"  value="Register">
+        <br>
+        <br>
+        <a class='register' href='/login'>Login</a>
+    </form>
+</div>
+{% endblock %}
