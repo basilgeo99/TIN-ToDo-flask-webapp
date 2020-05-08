@@ -7,7 +7,7 @@ app.secret_key = "cf14150cf9357da5553b4731f29fb23980a29f64"
 app.debug = False
 localdb = 'sqlite:///localDB'
 herokudb = 'postgres://lhehasysqqwtyz:ff04c85afaedfb1a603b1cd10d90333e2ee5a7fcdf839c7e0525e07596ef013f@ec2-54-88-130-244.compute-1.amazonaws.com:5432/d74sh0ulo06hlt'
-app.config['SQLALCHEMY_DATABASE_URI'] = localdb
+app.config['SQLALCHEMY_DATABASE_URI'] = herokudb
 db = SQLAlchemy(app)
 
 
