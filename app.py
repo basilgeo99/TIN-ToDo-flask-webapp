@@ -1,11 +1,12 @@
 from flask import url_for,Flask,render_template,request,redirect,session,flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from settings import DATABASE_URL,SECRET_KEY
+from settings import DATABASE_URL,SECRET_KEY,SQLALCHEMY_TRACK_MODIFICATIONS
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+app.config['SQLALCHEMY_TRACK_MODFICATIONS'] = SQLALCHEMY_TRACK_MODIFICATIONS
 db = SQLAlchemy(app)
 
 
