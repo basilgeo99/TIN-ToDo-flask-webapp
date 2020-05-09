@@ -6,7 +6,7 @@ from settings import DATABASE_URL,SECRET_KEY,SQLALCHEMY_TRACK_MODIFICATIONS
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
-app.config['SQLALCHEMY_TRACK_MODFICATIONS'] = SQLALCHEMY_TRACK_MODIFICATIONS
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_TRACK_MODIFICATIONS
 db = SQLAlchemy(app)
 
 
@@ -37,19 +37,22 @@ def login():
     userid = ''
     paswd = ''
     if request.method == 'POST':
-        userid = request.form['userid']
-        paswd = request.form['password']
-        if userid==None or paswd==None:
-            flash("Userid and Password cannot be empty!")
-            redirect('/')
-        else:
-            users = Users.query.filter_by(userid=userid).first()
-        if(users.password == paswd):
-            session["user"] = users.userid
-            flash("Logged in successfully")
-            return redirect('/tasks/')
-        else :
-            return redirect('/')         
+        try:
+            userid = request.form['userid']
+            paswd = request.form['password']
+            if userid==None or paswd==None:
+                flash("Userid and Password cannot be empty!")
+                redirect('/')
+            else:
+                users = Users.query.filter_by(userid=userid).first()
+            if(users.password == paswd):
+                session["user"] = users.userid
+                flash("Logged in successfully")
+                return redirect('/tasks/')
+            else :
+                return redirect('/') 
+        except:
+            flash("SQL Occurred - Check your credentials")        
     return render_template('login.html')
 
 @app.route('/register/',methods=['POST','GET'])
@@ -57,20 +60,24 @@ def register():
     if "user" in session:
         return redirect('/tasks/')
     if request.method == 'POST':
-        email = request.form['email']
-        userid = request.form['userid']
-        password = request.form['password']
-        existcheck = Todo.query.filter_by(userid=userid).first()
-        if(existcheck==None):
-            new_registry = Users(userid=userid,email=email,password=password)
-            try:
-                db.session.add(new_registry)
-                db.session.commit()
-            except:
-                flash('There was an internal issue creating a new user - Contact TechSupport')
-            return redirect('/login/')
-        else:
-            pass
+        try:
+            email = request.form['email']
+            userid = request.form['userid']
+            password = request.form['password']
+            existcheckid = Todo.query.filter_by(userid=userid).first()
+            existcheckemail = Todo.query.filter_by(userid=email).first()
+            if(existcheckid==None and existcheckemail==None):
+                new_registry = Users(userid=userid,email=email,password=password)
+                try:
+                    db.session.add(new_registry)
+                    db.session.commit()
+                except:
+                    flash('There was an internal issue creating a new user - Contact TechSupport')
+                return redirect('/login/')
+            else:
+                flash("That userid and account already exists - Contact TechSupport if you forgot your password")
+        except:
+            flash("SQL Error - Check data") 
     return render_template('register.html')
 
 @app.route('/tasks/',methods=['POST','GET'])
@@ -78,17 +85,20 @@ def tasks():
     if "user" in session:
         userid = session["user"]
         if request.method == 'POST':
-            task_content = request.form['content']
-            new_task = Todo(userid=userid,content=task_content)
             try:
+                task_content = request.form['content']
+                new_task = Todo(userid=userid,content=task_content)
                 db.session.add(new_task)
                 db.session.commit()
                 flash("Task added successfully :)")
-            except :
-                flash('There was an issue adding that task, try again or try later')
-            return redirect('/tasks/')
+                return redirect('/tasks/')
+            except:
+                flash("SQL Error - Could not add item") 
         else:
-            tasks = Todo.query.filter_by(userid=userid).order_by(Todo.date_created).all()
+            try:
+                tasks = Todo.query.filter_by(userid=userid).order_by(Todo.date_created).all()
+            except:
+                flash("SQL Error - Could not fetch tasks")
             return render_template('tasks.html',tasks=tasks,userid=userid)
     else:
         return redirect('/')
