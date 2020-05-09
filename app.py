@@ -50,6 +50,7 @@ def login():
                 flash("Logged in successfully")
                 return redirect('/tasks/')
             else :
+                flash("Credentials error")
                 return redirect('/') 
         except:
             flash("SQL Occurred - Check your credentials")        
